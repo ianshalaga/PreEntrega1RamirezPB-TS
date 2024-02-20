@@ -1,56 +1,80 @@
-// import fs from "fs";
-import * as fs from "fs";
+import fs from "fs";
 
-interface IdProduct {
+export interface IdProduct {
   id: number;
-  code: string;
   title: string;
   description: string;
-  price: string;
-  thumbnail: string;
-  stock: string;
-  [key: string]: string | number; // to access with obj[field] form
+  code: string;
+  price: number;
+  stock: number;
+  category: string;
+  status: boolean;
+  thumbnail: string[];
+  [key: string]: string | string[] | number | boolean; // to access with obj[field] form
+}
+
+// ? Optional properties
+interface updateProduct {
+  title?: string;
+  description?: string;
+  code?: string;
+  price?: number;
+  stock?: number;
+  category?: string;
+  status?: boolean;
+  thumbnail?: string[];
+  [key: string]: string | string[] | number | boolean; // to access with obj[field] form
 }
 
 class Product {
-  code: string;
   title: string;
   description: string;
-  price: string;
-  thumbnail: string;
-  stock: string;
+  code: string;
+  price: number;
+  stock: number;
+  category: string;
+  status: boolean;
+  thumbnail: string[];
 
   constructor(
-    code: string,
     title: string,
     description: string,
-    price: string,
-    thumbnail: string,
-    stock: string
+    code: string,
+    price: number,
+    stock: number,
+    category: string,
+    status: boolean,
+    thumbnail: string[]
   ) {
-    if (!(code && title && description && price && thumbnail && stock)) {
+    if (
+      !(title && description && code && price && stock && category && status)
+    ) {
       throw new Error(
         "Los parámetros del constructor de Product son obligatorios."
       );
     }
 
-    this.code = code;
     this.title = title;
     this.description = description;
     this.price = price;
-    this.thumbnail = thumbnail;
+    this.code = code;
     this.stock = stock;
+    this.category = category;
+    this.status = status;
+    this.thumbnail = thumbnail;
   }
 
   addId(id: number) {
     const idProduct: IdProduct = {
       id, // Equal to: id: id
-      code: this.code,
       title: this.title,
       description: this.description,
+      code: this.code,
       price: this.price,
-      thumbnail: this.thumbnail,
       stock: this.stock,
+      category: this.category,
+      status: this.status,
+      thumbnail: this.thumbnail,
     };
     return idProduct;
   }
@@ -69,11 +93,8 @@ class ProductManager {
 
   private generateId(): number {
     let maxId = 0;
-
     const ids = this.products.map((product) => product.id);
-
     if (ids.length !== 0) maxId = Math.max(...ids);
-
     return maxId;
   }
 
@@ -108,32 +129,32 @@ class ProductManager {
     }
   }
 
-  async addProduct(
-    code: string,
-    title: string,
-    description: string,
-    price: string,
-    thumbnail: string,
-    stock: string
-  ) {
-    // Check for repeated code
-    if (this.products.some((element) => code === element.code)) {
-      throw new Error(
-        "El código del producto que está intentando agregar ya existe. Utilice otro código."
-      );
-    }
-
+  async addProduct(productObj: Product, callbackStatus: Function) {
     // Read data from file
     await this.readProductsFromFileAsyncPromises();
 
+    // Check for repeated code
+    if (this.products.some((element) => productObj.code === element.code)) {
+      callbackStatus(
+        new Error(
+          "El código del producto que está intentando agregar ya existe. Utilice otro código."
+        )
+      );
+      return;
+    } else {
+      callbackStatus(null);
+    }
+
     // Create new product
     const product = new Product(
-      code,
-      title,
-      description,
-      price,
-      thumbnail,
-      stock
+      productObj.title,
+      productObj.description,
+      productObj.code,
+      productObj.price,
+      productObj.stock,
+      productObj.category,
+      productObj.status,
+      productObj.thumbnail
     );
 
     // Add an id to product and update products array
@@ -155,16 +176,26 @@ class ProductManager {
     await this.readProductsFromFileAsyncPromises();
 
     const idProduct = this.products.find((product) => product.id === id);
-
-    // if (idProduct) {
-    //     return idProduct
-    // } else {
-    //     throw new Error(`Producto con id ${id} no encontrado.`)
-    // }
     return idProduct;
   }
 
-  async updateProduct(id: number, field: string, value: string): Promise<void> {
+  async updateProduct(
+    id: number,
+    updateObj: updateProduct,
+    callbackStatus: Function
+  ): Promise<void> {
+    let idField = false;
+
+    // Don't touch the id field
+    Object.keys(updateObj).forEach((key) => {
+      if (key === "id") {
+        idField = true;
+        callbackStatus(new Error("Está intentando modificar el campo id."));
+      }
+    });
+
+    if (idField) return;
+
     // Load products from file
     await this.readProductsFromFileAsyncPromises();
 
@@ -172,18 +203,29 @@ class ProductManager {
 
     const productsUpdated = this.products.map((product) => {
       if (product.id === id) {
-        if (field in product) {
-          product[field] = value;
-          existProduct = true;
-        } else {
-          throw new Error(`Los productos no cuentan con el campo ${field}.`);
-        }
+        Object.keys(updateObj).forEach((key) => {
+          if (key in product) {
+            // The key exists in product
+            product[key] = updateObj[key];
+          } else {
+            // The key doesn't exist in product
+            callbackStatus(
+              new Error(`Los productos no cuentan con el campo: ${key}.`)
+            );
+          }
+        });
+        existProduct = true;
       }
       return product;
     });
 
+    // Id not found
     if (!existProduct) {
-      throw new Error(`El producto con id igual a ${id} no fue encontrado.`);
+      callbackStatus(
+        new Error(`El producto con id igual a ${id} no fue encontrado.`)
+      );
+    } else {
+      callbackStatus(null);
     }
 
     this.products = productsUpdated;
@@ -192,7 +234,7 @@ class ProductManager {
     await this.writeProductsIntoFileAsyncPromises();
   }
 
-  async deleteProduct(id: number): Promise<void> {
+  async deleteProduct(id: number, callbackStatus: Function): Promise<void> {
     // Load products from file
     await this.readProductsFromFileAsyncPromises();
 
@@ -208,7 +250,11 @@ class ProductManager {
     });
 
     if (!existProduct) {
-      throw new Error(`El producto con id igual a ${id} no fue encontrado.`);
+      callbackStatus(
+        new Error(`El producto con id igual a ${id} no fue encontrado.`)
+      );
+    } else {
+      callbackStatus(null);
     }
 
     this.products = productsUpdated;

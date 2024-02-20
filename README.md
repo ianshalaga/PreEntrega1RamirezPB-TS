@@ -6,7 +6,7 @@ Primera pre entrega del proyecto final del curso de Programación Backend de Cod
 
 Se desarrollará un servidor que contenga los **endpoints** y servicios necesarios para gestionar los productos y carritos de compra en el **e-commerce**.
 
-Desarrollar el servidor basado en **Node.js** y **Express.js**, que escuche en el **puerto 8080** y disponga de dos grupos de rutas: **/products** y **/carts**. Dichos **endpoints** estarán implementados con el **router de express**, con las siguientes especificaciones:
+Desarrollar el servidor basado en **Node.js** y **Express.js**, que escuche en el **puerto 8080** y disponga de dos grupos de rutas: **/products** y **/carts**. Dichos **endpoints** estarán implementados con el **router** de **express**, con las siguientes especificaciones:
 
 - Para el manejo de **productos**, los cuales tendrán su **router** en **/api/products/**, configurar las siguientes rutas:
 

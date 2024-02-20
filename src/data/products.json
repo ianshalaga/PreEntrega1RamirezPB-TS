@@ -1,0 +1,157 @@
+[
+  {
+    "id": 4,
+    "title": "Product 4",
+    "description": "This is product 4",
+    "code": "p4",
+    "price": 400,
+    "stock": 40,
+    "category": "category 4",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Product 8",
+    "description": "string",
+    "code": "dfgdfg",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Product 9",
+    "description": "This is product 9",
+    "code": "p9",
+    "price": 900,
+    "stock": 90,
+    "category": "category 9",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 11,
+    "title": "producto",
+    "description": "Este es un producto",
+    "code": "p100",
+    "price": 100,
+    "stock": 1,
+    "category": "category",
+    "status": true,
+    "thumbnail": [
+      "/product,jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 12,
+    "title": "producto",
+    "description": "Este es un producto",
+    "code": "p10345",
+    "price": 100,
+    "stock": 1,
+    "category": "category",
+    "status": true,
+    "thumbnail": [
+      "/product,jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 13,
+    "title": "producto",
+    "description": "Este es un producto",
+    "code": "p15",
+    "price": 100,
+    "stock": 1,
+    "category": "category",
+    "status": true
+  },
+  {
+    "id": 14,
+    "title": "string",
+    "description": "string",
+    "code": "string",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 15,
+    "title": "string",
+    "description": "string",
+    "code": "string",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 16,
+    "title": "string",
+    "description": "string",
+    "code": "dfgdfg",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 17,
+    "title": "string",
+    "description": "string",
+    "code": "123",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 18,
+    "title": "string",
+    "description": "string",
+    "code": "364356",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 19,
+    "title": "string",
+    "description": "string",
+    "code": "dfgdfg",
+    "price": 789,
+    "stock": 456,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg"
+    ]
+  }
+]
