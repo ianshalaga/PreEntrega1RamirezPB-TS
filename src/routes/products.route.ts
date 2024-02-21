@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { productsPath } from "../utils/utils";
+import { productsPath, successStatus, failureStatus } from "../utils/utils";
 import ProductManager from "../ProductManager";
 
 const productsRouter = Router(); // Express.js Router instance
@@ -36,7 +36,7 @@ productsRouter.get("/:pid", async (req: Request, res: Response) => {
   if (idProduct) {
     res.json(idProduct); // Product found
   } else {
-    res.status(404).json({ error: `El producto con id ${pid} no existe.` }); // Product not found
+    res.status(404).json(failureStatus(`El producto con id ${pid} no existe.`)); // Product not found / client error
   }
 });
 
@@ -47,12 +47,9 @@ productsRouter.post("/", async (req: Request, res: Response) => {
   // Add new Product
   await productManager.addProduct(product, (error: Error) => {
     if (error) {
-      res.status(500).json({
-        status: "FAILURE",
-        message: error.message,
-      });
+      res.status(500).json(failureStatus(error.message)); // Server error
     } else {
-      res.json({ status: "SUCCESS" });
+      res.json(successStatus);
     }
   });
 });
@@ -64,12 +61,9 @@ productsRouter.put("/:pid", async (req: Request, res: Response) => {
   const updateProperties = req.body;
   await productManager.updateProduct(pid, updateProperties, (error: Error) => {
     if (error) {
-      res.status(500).json({
-        status: "FAILURE",
-        message: error.message,
-      });
+      res.status(500).json(failureStatus(error.message));
     } else {
-      res.json({ status: "SUCCESS" });
+      res.json(successStatus);
     }
   });
 });
@@ -80,9 +74,9 @@ productsRouter.delete("/:pid", async (req: Request, res: Response) => {
   const pid: number = parseInt(req.params.pid); // URL param pid into integer format
   await productManager.deleteProduct(pid, (error: Error) => {
     if (error) {
-      res.status(404).json({ status: "FAILURE", message: error.message });
+      res.status(404).json(failureStatus(error.message));
     } else {
-      res.json({ status: "SUCCESS" });
+      res.json(successStatus);
     }
   });
 });

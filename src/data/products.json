@@ -1,38 +1,12 @@
 [
   {
-    "id": 4,
-    "title": "Product 4",
-    "description": "This is product 4",
-    "code": "p4",
-    "price": 400,
-    "stock": 40,
-    "category": "category 4",
-    "status": true,
-    "thumbnail": [
-      "/product.jpg"
-    ]
-  },
-  {
     "id": 8,
     "title": "Product 8",
-    "description": "string",
+    "description": "ZZZZZZZZZZZZZZ",
     "code": "dfgdfg",
-    "price": 789,
+    "price": 789666,
     "stock": 456,
     "category": "string",
-    "status": true,
-    "thumbnail": [
-      "/product.jpg"
-    ]
-  },
-  {
-    "id": 9,
-    "title": "Product 9",
-    "description": "This is product 9",
-    "code": "p9",
-    "price": 900,
-    "stock": 90,
-    "category": "category 9",
     "status": true,
     "thumbnail": [
       "/product.jpg"
@@ -90,32 +64,6 @@
     ]
   },
   {
-    "id": 15,
-    "title": "string",
-    "description": "string",
-    "code": "string",
-    "price": 789,
-    "stock": 456,
-    "category": "string",
-    "status": true,
-    "thumbnail": [
-      "/product.jpg"
-    ]
-  },
-  {
-    "id": 16,
-    "title": "string",
-    "description": "string",
-    "code": "dfgdfg",
-    "price": 789,
-    "stock": 456,
-    "category": "string",
-    "status": true,
-    "thumbnail": [
-      "/product.jpg"
-    ]
-  },
-  {
     "id": 17,
     "title": "string",
     "description": "string",
@@ -145,12 +93,147 @@
     "id": 19,
     "title": "string",
     "description": "string",
-    "code": "dfgdfg",
+    "code": "1",
     "price": 789,
-    "stock": 456,
+    "stock": 123,
     "category": "string",
     "status": true,
     "thumbnail": [
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 20,
+    "title": "string",
+    "description": "string",
+    "code": "2",
+    "price": 789,
+    "stock": 123,
+    "category": "string",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 21,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "3",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 22,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "4",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 23,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "5",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 24,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "6",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 25,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "7",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 26,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "8",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 70,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "78789798789",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
+      "/product.jpg"
+    ]
+  },
+  {
+    "id": 71,
+    "title": "Productaso",
+    "description": "Alto producto",
+    "code": "9",
+    "price": 1000,
+    "stock": 20,
+    "category": "La mejor",
+    "status": true,
+    "thumbnail": [
+      "/product.jpg",
       "/product.jpg"
     ]
   }

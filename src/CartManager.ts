@@ -1,16 +1,15 @@
 import fs from "fs";
-
-// interface cartProduct {
-//   product: number;
-//   quantity: number;
-//   [key: string]: number;
-// }
+import {
+  readDataFromJsonFileAsyncPromises,
+  writeDataIntoJsonFileAsyncPromises,
+  generateId,
+} from "./utils/utils";
 
 class CartProduct {
   product: number;
   quantity: number;
 
-  constructor(product: number, quantity: number = 0) {
+  constructor(product: number, quantity: number = 1) {
     if (!product) {
       throw new Error(
         "Los parámetros del constructor de CartProduct son obligatorios."
@@ -33,14 +32,7 @@ interface IdCart {
 
 class Cart {
   products: CartProduct[];
-
   constructor(products: CartProduct[] = []) {
-    // if (!products) {
-    //   throw new Error(
-    //     "Los parámetros del constructor de Cart son obligatorios."
-    //   );
-    // }
-
     this.products = products;
   }
 
@@ -64,42 +56,18 @@ export class CartManager {
 
   static codeBase: number = 0;
 
-  private generateId(): number {
-    let maxId = 0;
-    const ids = this.carts.map((cart) => cart.id);
-    if (ids.length !== 0) maxId = Math.max(...ids);
-    return maxId;
+  private generateProductId(): number {
+    const ids = this.carts.map((carts) => carts.id);
+    return generateId(ids);
   }
 
   private async readCartsFromFileAsyncPromises(): Promise<void> {
-    try {
-      const data = await fs.promises.readFile(this.path, "utf8");
-      this.carts = JSON.parse(data);
-      CartManager.codeBase = this.generateId();
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(
-          `Error al cargar los carros desde el archivo: ${error.message}`
-        );
-      } else {
-        throw error;
-      }
-    }
+    this.carts = await readDataFromJsonFileAsyncPromises(this.path);
+    CartManager.codeBase = this.generateProductId();
   }
 
   private async writeCartsIntoFileAsyncPromises(): Promise<void> {
-    try {
-      const cartsJson = JSON.stringify(this.carts, null, 2);
-      await fs.promises.writeFile(this.path, cartsJson, "utf8");
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(
-          `Error al guardar carros en el archivo: ${error.message}`
-        );
-      } else {
-        throw error;
-      }
-    }
+    writeDataIntoJsonFileAsyncPromises(this.path, this.carts);
   }
 
   async createCart() {
@@ -121,10 +89,8 @@ export class CartManager {
   }
 
   async addProductToCart(cid: number, pid: number, callbackStatus: Function) {
-    // Read Carts from file
-    await this.readCartsFromFileAsyncPromises();
-    // Flag for unvalid cid
-    let cartFound = false;
+    await this.readCartsFromFileAsyncPromises(); // Read Carts from file
+    let cartFound = false; // Flag for unvalid cid
     // Search for cid in this.carts
     const carts = this.carts.map((cart) => {
       if (cart.id === cid) {
@@ -132,6 +98,7 @@ export class CartManager {
         // When Cart is empty
         if (cart.products.length === 0) {
           cart.products.push(new CartProduct(pid));
+          return cart;
         }
         let productExist = false;
         // When Cart is not empty
@@ -159,13 +126,11 @@ export class CartManager {
     // If cid not found
     if (!cartFound) {
       callbackStatus(new Error(`El carro con id ${cid} no existe.`));
-    } else {
-      callbackStatus(null);
+      return; // Early return
     }
-    // Update Carts
-    this.carts = carts;
-    // Write Carts into file
-    await this.writeCartsIntoFileAsyncPromises();
+    this.carts = carts; // Update Carts
+    await this.writeCartsIntoFileAsyncPromises(); // Write Carts into file
+    callbackStatus(null);
   }
 
   async getCarts() {}

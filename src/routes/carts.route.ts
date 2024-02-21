@@ -1,5 +1,11 @@
 import { Router, Request, Response } from "express";
-import { productRoute, cartsPath, productsPath } from "../utils/utils";
+import {
+  productRoute,
+  cartsPath,
+  productsPath,
+  successStatus,
+  failureStatus,
+} from "../utils/utils";
 import { CartManager } from "../CartManager";
 import ProductManager from "../ProductManager";
 
@@ -15,17 +21,14 @@ cartsRouter.get("/:cid", async (req: Request, res: Response) => {
     res.json(idCart.products);
   } else {
     // Cart not found
-    res.status(404).json({
-      status: "FAILURE",
-      error: `El carro con id ${cid} no existe.`,
-    });
+    res.status(404).json(failureStatus(`El carro con id ${cid} no existe.`));
   }
 });
 
 cartsRouter.post("/", async (req: Request, res: Response) => {
   const cartManager = new CartManager(cartsPath); // New CartManager instance
   await cartManager.createCart(); // Create new Cart
-  res.json({ status: "SUCCESS" });
+  res.json(successStatus);
 });
 
 cartsRouter.post(
@@ -38,21 +41,18 @@ cartsRouter.post(
     const idProduct = await productManager.getProductById(pid);
     // Product not found (undefined)
     if (!idProduct) {
-      res.status(404).json({
-        status: "FAILURE",
-        error: `El producto con id ${pid} no existe.`,
+      res
+        .status(404)
+        .json(failureStatus(`El producto con id ${pid} no existe.`));
+    } else {
+      await cartManager.addProductToCart(cid, pid, (error: Error) => {
+        if (error) {
+          res.status(404).json(failureStatus(error.message));
+        } else {
+          res.json(successStatus);
+        }
       });
     }
-    await cartManager.addProductToCart(cid, pid, (error: Error) => {
-      if (error) {
-        res.status(404).json({
-          status: "FAILURE",
-          message: error.message,
-        });
-      } else {
-        res.json({ status: "SUCCESS" });
-      }
-    });
   }
 );
 

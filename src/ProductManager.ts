@@ -1,4 +1,9 @@
 import fs from "fs";
+import {
+  readDataFromJsonFileAsyncPromises,
+  writeDataIntoJsonFileAsyncPromises,
+  generateId,
+} from "./utils/utils";
 
 export interface IdProduct {
   id: number;
@@ -43,8 +48,8 @@ class Product {
     price: number,
     stock: number,
     category: string,
-    status: boolean,
-    thumbnail: string[]
+    status: boolean = true,
+    thumbnail: string[] = []
   ) {
     if (
       !(title && description && code && price && stock && category && status)
@@ -91,48 +96,23 @@ class ProductManager {
 
   static codeBase: number = 0;
 
-  private generateId(): number {
-    let maxId = 0;
+  private generateProductId(): number {
     const ids = this.products.map((product) => product.id);
-    if (ids.length !== 0) maxId = Math.max(...ids);
-    return maxId;
+    return generateId(ids);
   }
 
   private async readProductsFromFileAsyncPromises(): Promise<void> {
-    try {
-      const data = await fs.promises.readFile(this.path, "utf8");
-      this.products = JSON.parse(data);
-      ProductManager.codeBase = this.generateId();
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(
-          `Error al cargar los productos desde el archivo: ${error.message}`
-        );
-      } else {
-        throw error;
-      }
-    }
+    this.products = await readDataFromJsonFileAsyncPromises(this.path);
+    ProductManager.codeBase = this.generateProductId();
   }
 
   private async writeProductsIntoFileAsyncPromises(): Promise<void> {
-    try {
-      const productsJson = JSON.stringify(this.products, null, 2);
-      await fs.promises.writeFile(this.path, productsJson, "utf8");
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(
-          `Error al guardar productos en el archivo: ${error.message}`
-        );
-      } else {
-        throw error;
-      }
-    }
+    writeDataIntoJsonFileAsyncPromises(this.path, this.products);
   }
 
   async addProduct(productObj: Product, callbackStatus: Function) {
     // Read data from file
     await this.readProductsFromFileAsyncPromises();
-
     // Check for repeated code
     if (this.products.some((element) => productObj.code === element.code)) {
       callbackStatus(
@@ -140,11 +120,8 @@ class ProductManager {
           "El código del producto que está intentando agregar ya existe. Utilice otro código."
         )
       );
-      return;
-    } else {
-      callbackStatus(null);
+      return; // Early return
     }
-
     // Create new product
     const product = new Product(
       productObj.title,
@@ -156,12 +133,9 @@ class ProductManager {
       productObj.status,
       productObj.thumbnail
     );
-
-    // Add an id to product and update products array
-    this.products.push(product.addId(++ProductManager.codeBase));
-
-    // Save products array into file
-    await this.writeProductsIntoFileAsyncPromises();
+    this.products.push(product.addId(++ProductManager.codeBase)); // Add an id to product and update products array
+    await this.writeProductsIntoFileAsyncPromises(); // Save products array into file
+    callbackStatus(null); // No errors
   }
 
   async getProducts(): Promise<IdProduct[]> {
@@ -185,22 +159,18 @@ class ProductManager {
     callbackStatus: Function
   ): Promise<void> {
     let idField = false;
-
     // Don't touch the id field
     Object.keys(updateObj).forEach((key) => {
       if (key === "id") {
-        idField = true;
         callbackStatus(new Error("Está intentando modificar el campo id."));
+        idField = true;
+        return; // Break
       }
     });
-
-    if (idField) return;
-
-    // Load products from file
-    await this.readProductsFromFileAsyncPromises();
-
+    if (idField) return; // Early return
+    await this.readProductsFromFileAsyncPromises(); // Load products from file
     let existProduct = false;
-
+    let errorField = null;
     const productsUpdated = this.products.map((product) => {
       if (product.id === id) {
         Object.keys(updateObj).forEach((key) => {
@@ -209,38 +179,39 @@ class ProductManager {
             product[key] = updateObj[key];
           } else {
             // The key doesn't exist in product
-            callbackStatus(
-              new Error(`Los productos no cuentan con el campo: ${key}.`)
+            errorField = new Error(
+              `Los productos no cuentan con el campo: ${key}.`
             );
+            // callbackStatus(
+            //   new Error(`Los productos no cuentan con el campo: ${key}.`)
+            // );
           }
         });
         existProduct = true;
       }
       return product;
     });
-
+    // Some field was not found
+    if (errorField) {
+      callbackStatus(errorField);
+      return; // Early return
+    }
     // Id not found
     if (!existProduct) {
       callbackStatus(
         new Error(`El producto con id igual a ${id} no fue encontrado.`)
       );
-    } else {
-      callbackStatus(null);
+      return; // Early return
     }
-
     this.products = productsUpdated;
-
-    // Save products into file
-    await this.writeProductsIntoFileAsyncPromises();
+    await this.writeProductsIntoFileAsyncPromises(); // Save products into file
+    callbackStatus(null);
   }
 
   async deleteProduct(id: number, callbackStatus: Function): Promise<void> {
-    // Load products from file
-    await this.readProductsFromFileAsyncPromises();
-
+    await this.readProductsFromFileAsyncPromises(); // Load products from file
     const productsUpdated: IdProduct[] = [];
     let existProduct = false;
-
     this.products.forEach((product) => {
       if (product.id !== id) {
         productsUpdated.push(product);
@@ -248,19 +219,15 @@ class ProductManager {
         existProduct = true;
       }
     });
-
     if (!existProduct) {
       callbackStatus(
         new Error(`El producto con id igual a ${id} no fue encontrado.`)
       );
-    } else {
-      callbackStatus(null);
+      return; // Early return
     }
-
     this.products = productsUpdated;
-
-    // Save products into file
-    await this.writeProductsIntoFileAsyncPromises();
+    await this.writeProductsIntoFileAsyncPromises(); // Save products into file
+    callbackStatus(null);
   }
 }
 
