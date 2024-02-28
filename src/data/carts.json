@@ -42,15 +42,19 @@
     "products": [
       {
         "product": 19,
-        "quantity": 7
+        "quantity": 9
       },
       {
         "product": 18,
-        "quantity": 1
+        "quantity": 2
       },
       {
         "product": 17,
-        "quantity": 0
+        "quantity": 2
+      },
+      {
+        "product": 11,
+        "quantity": 3
       }
     ]
   },

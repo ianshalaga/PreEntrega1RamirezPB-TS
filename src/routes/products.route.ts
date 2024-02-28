@@ -1,50 +1,56 @@
 import { Router, Request, Response } from "express";
-import { productsPath, successStatus, failureStatus } from "../utils/utils";
-import ProductManager from "../ProductManager";
+import ProductManager from "../classes/ProductManager";
+import QueryParams from "../interfaces/QueryParams";
+import UpdateProduct from "../interfaces/UpdateProduct";
+import IdProduct from "../interfaces/IdProduct";
+import { productsPath } from "../utils/paths";
+import { successStatus, failureStatus } from "../utils/statuses";
+import Product from "../classes/Product";
+import validateQueryParams from "../validators/queryParams";
+import validateId from "../validators/ids";
+import validateUpdateProduct from "../validators/updateProduct";
 
-const productsRouter = Router(); // Express.js Router instance
+const productsRouter: Router = Router();
 
-// Queries interface
-interface QueryParams {
-  limit?: string; // ? Optional property
-}
-
-// Set a route in Express.js application to handle GET requests (GET ENDPOINT with QUERIES)
+/** GET ENDPOINTS */
 productsRouter.get("/", async (req: Request, res: Response) => {
-  // Reading products
-  const productManager = new ProductManager(productsPath); // New ProductManager instance
-  const products = await productManager.getProducts(); // Get all Products
-  // Set max limit value
+  const productManager: ProductManager = new ProductManager(productsPath);
+  const products: IdProduct[] = await productManager.getProducts();
   let limitParsed: number = products.length;
-  // Get all queries
-  const queryParams: QueryParams = req.query;
-  // Get limit query
+  const queryParams: QueryParams = validateQueryParams(req.query);
+  if (!queryParams) {
+    res.status(404).json(failureStatus("Query Params inválidos."));
+    return;
+  }
   const { limit } = queryParams;
-  // If limit is not undefined
+  console.log(limit);
   if (limit) {
-    limitParsed = parseInt(limit); // Update and parse new limit
+    limitParsed = parseInt(limit);
   }
   res.json(products.splice(0, limitParsed));
 });
 
-// GET ENDPOINT with PARAMS
 productsRouter.get("/:pid", async (req: Request, res: Response) => {
-  const productManager = new ProductManager(productsPath); // New ProductManager instance
-  const pid: number = parseInt(req.params.pid); // URL param pid into integer format
-  const idProduct = await productManager.getProductById(pid); // Get Product by id
-  // If idProduct is not undefined
-  if (idProduct) {
-    res.json(idProduct); // Product found
+  const productManager: ProductManager = new ProductManager(productsPath);
+  const pid: number = validateId(req.params.pid);
+  if (pid) {
+    const idProduct: IdProduct = await productManager.getProductById(pid);
+    if (idProduct) {
+      res.json(idProduct);
+    } else {
+      res
+        .status(404)
+        .json(failureStatus(`El producto con id ${pid} no existe.`));
+    }
   } else {
-    res.status(404).json(failureStatus(`El producto con id ${pid} no existe.`)); // Product not found / client error
+    res.status(404).json(failureStatus("Pid inválido."));
   }
 });
 
-// POST ENDPOINT
+/** POST ENDPOINT */
 productsRouter.post("/", async (req: Request, res: Response) => {
-  const productManager = new ProductManager(productsPath); // New ProductManager instance
-  const product = req.body; // New Product to add
-  // Add new Product
+  const productManager: ProductManager = new ProductManager(productsPath);
+  const product: Product = req.body;
   await productManager.addProduct(product, (error: Error) => {
     if (error) {
       res.status(500).json(failureStatus(error.message)); // Server error
@@ -54,31 +60,49 @@ productsRouter.post("/", async (req: Request, res: Response) => {
   });
 });
 
-// PUT ENDPOINT with PARAMS
+/** PUT ENDPOINT */
 productsRouter.put("/:pid", async (req: Request, res: Response) => {
-  const productManager = new ProductManager(productsPath); // New ProductManager instance
-  const pid: number = parseInt(req.params.pid); // URL param pid into integer format
-  const updateProperties = req.body;
-  await productManager.updateProduct(pid, updateProperties, (error: Error) => {
-    if (error) {
-      res.status(500).json(failureStatus(error.message));
+  const productManager: ProductManager = new ProductManager(productsPath);
+  // const pid: number = parseInt(req.params.pid);
+  const pid: number = validateId(req.params.pid);
+  if (pid) {
+    const updateProperties: UpdateProduct = validateUpdateProduct(req.body);
+    if (updateProperties) {
+      await productManager.updateProduct(
+        pid,
+        updateProperties,
+        (error: Error) => {
+          if (error) {
+            res.status(500).json(failureStatus(error.message));
+          } else {
+            res.json(successStatus);
+          }
+        }
+      );
     } else {
-      res.json(successStatus);
+      res.status(404).json(failureStatus("Propiedades inválidas."));
     }
-  });
+  } else {
+    res.status(404).json(failureStatus("Product ID inválido."));
+  }
 });
 
-// DELETE ENDPOINT with PARAMS
+/** DELETE ENDPOINT */
 productsRouter.delete("/:pid", async (req: Request, res: Response) => {
-  const productManager = new ProductManager(productsPath); // New ProductManager instance
-  const pid: number = parseInt(req.params.pid); // URL param pid into integer format
-  await productManager.deleteProduct(pid, (error: Error) => {
-    if (error) {
-      res.status(404).json(failureStatus(error.message));
-    } else {
-      res.json(successStatus);
-    }
-  });
+  const productManager: ProductManager = new ProductManager(productsPath);
+  // const pid: number = parseInt(req.params.pid);
+  const pid: number = validateId(req.params.pid);
+  if (pid) {
+    await productManager.deleteProduct(pid, (error: Error) => {
+      if (error) {
+        res.status(404).json(failureStatus(error.message));
+      } else {
+        res.json(successStatus);
+      }
+    });
+  } else {
+    res.status(404).json(failureStatus("Product ID inválido."));
+  }
 });
 
 export default productsRouter;
